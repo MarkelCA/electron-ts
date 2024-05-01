@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
-import {activeUserHandler} from './modules/activeuser';
+import { initializeHandlers } from './channels'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -33,7 +33,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 // app.on('ready', createWindow);
 app.whenReady().then(() => {
-    initializeHandlers();
+    initializeHandlers(ipcMain);
     createWindow();
 })
 
@@ -53,20 +53,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-
-// IPC Router
-// Routes the IPC calls to the appropriate handler based on the channel name
-interface IPCRouter {
-    [key: string]: (event: Electron.IpcMainInvokeEvent, ...args: any[]) => any;
-}
-
-const ipcRouter: IPCRouter = {
-    'get-user-data': activeUserHandler
-};
-
-function initializeHandlers() {
-    Object.keys(ipcRouter).forEach((key) => {
-        ipcMain.handle(key, ipcRouter[key]);
-    });
-}
