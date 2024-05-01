@@ -28,21 +28,10 @@ const createWindow = () => {
 };
 
 
-interface IPCHandler {
-    [key: string]: (event: Electron.IpcMainInvokeEvent, ...args: any[]) => any;
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 // app.on('ready', createWindow);
-function initializeHandlers() {
-    ipcHandles.forEach((handle) => {
-        Object.keys(handle).forEach((key) => {
-            ipcMain.handle(key, handle[key]);
-        });
-    });
-}
 app.whenReady().then(() => {
     initializeHandlers();
     createWindow();
@@ -66,10 +55,18 @@ app.on('activate', () => {
 });
 
 
-// IPC Handlers
-const ipcHandles: IPCHandler[] = [
-    {
-        'get-user-data': activeUserHandler
-    }
-    
-];
+// IPC Router
+// Routes the IPC calls to the appropriate handler based on the channel name
+interface IPCRouter {
+    [key: string]: (event: Electron.IpcMainInvokeEvent, ...args: any[]) => any;
+}
+
+const ipcRouter: IPCRouter = {
+    'get-user-data': activeUserHandler
+};
+
+function initializeHandlers() {
+    Object.keys(ipcRouter).forEach((key) => {
+        ipcMain.handle(key, ipcRouter[key]);
+    });
+}

@@ -17,7 +17,7 @@ const allowedChannels: string[] = ["get-user-data"];
 
 contextBridge.exposeInMainWorld(
     "api", {
-        invoke: (channel: string, data?: any): Promise<any> => {
+        invoke: (channel: string, data?: any) => {
             if (allowedChannels.includes(channel)) {
                 return ipcRenderer.invoke(channel, data); 
             }
