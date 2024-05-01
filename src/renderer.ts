@@ -30,8 +30,7 @@ import './index.css';
 import { IPCChannel } from './channels';
 
 window.api.invoke(IPCChannel.GET_USER_DATA, 'Message from front')
-.then((data) => {
-    console.log(data);
-})
+    .then((data) => console.log(data))
+    .catch((error) => console.error(error));
 
 console.log('👋 This message is being logged by "renderer.ts", included via Vite');
